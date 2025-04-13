@@ -12,7 +12,7 @@ Database connection manager will manage application connections to the Postgres 
 singleton pattern into this will ensure that there is only one DB Connection Manager through
 out the application.
 
-File: [`DBConnectionManager.java`](./src/main/java/com/springboot/bookstore/database/DBConnectionManager.java)
+`DBConnectionManager.java` class: [`DBConnectionManager.java`](./src/main/java/com/springboot/bookstore/database/DBConnectionManager.java)
 
 ```java
 package com.springboot.bookstore.database;
@@ -63,10 +63,70 @@ public class DBConnectionManager {
 }
 ```
 
-Singleton pattern is applied to create one instance of the `DBConnectionManager`.
-
+- Singleton pattern is applied to create one instance of the `DBConnectionManager`.
 - Private constructor ensures that the class cannot be constructed with database connection initialization.
 - Generating an instance of the `DBConnectionManager` class can be archived by the `getInstance()` function. If the
-`instance` variable is not null or the database connection is lost, a new instance is created with new database connection.
-- Database connection can be retrieved by the `getConnection()` function. Due to the `static getInstance()` function, 
+`instance` variable is not null or the database connection is lost, a new instance is created with new database 
+connection. Database connection can be retrieved by the `getConnection()` function. Due to the `static getInstance()` function, 
 application can get the database connection of the current instance easily. 
+
+### System logging
+
+Applied singleton pattern to create a single instance `Logger` object for logging useful information of the request.
+
+`Logger` class: [`Logger`](./src/main/java/com/springboot/bookstore/utils/logger/Logger.java) 
+
+```java
+package com.springboot.bookstore.utils.logger;
+
+import java.time.LocalDateTime;
+
+public class Logger {
+    private static volatile Logger instance;
+
+    private Logger() {}
+
+    public static Logger getInstance() {
+        if (instance == null) {
+            synchronized (Logger.class) {
+                if (instance == null) {
+                    instance = new Logger();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void log(String message) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        System.out.println("[" + timestamp + "] " +  LogLevel.INFO + ": "  + message);
+    }
+
+    public void error(String message) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        System.out.println("[" + timestamp + "] " +  LogLevel.ERROR + ": "  + message);
+    }
+
+    public void warn(String message) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        System.out.println("[" + timestamp + "] " +  LogLevel.WARN + ": "  + message);
+    }
+
+    public void debug(String message) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        System.out.println("[" + timestamp + "] " +  LogLevel.DEBUG + ": "  + message);
+    }
+
+    public void fatal(String message) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        System.out.println("[" + timestamp + "] " +  LogLevel.FATAL + ": "  + message);
+    }
+}
+```
+
+- Singleton pattern is applied in `Logger` class to ensure only one instance of the `Logger` class through out the 
+application. This makes logging consistent and centralized.
+- Stateless logger will save memory and avoid unnecessary object creation.
+- Easy global access through out the application without parsing logger through function parameter.
+- Consistent log format and behavior.
+- Easy for future upgrade: file logging, external logging, etc.
