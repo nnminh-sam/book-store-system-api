@@ -2,6 +2,17 @@
 
 > This system is for practice design pattern purpose only!
 
+---
+
+## Table of Contents
+
+- [Singleton Pattern](#singleton-pattern)
+  - [Managing database connection](#managing-database-connection)
+  - [System logging](#system-logging)
+  - [Configuration manager](#configuration-manager)
+
+---
+
 ## Singleton Pattern
 
 These are three ways to apply Singleton pattern in Book store system.
@@ -130,3 +141,73 @@ application. This makes logging consistent and centralized.
 - Easy global access through out the application without parsing logger through function parameter.
 - Consistent log format and behavior.
 - Easy for future upgrade: file logging, external logging, etc.
+
+### Configuration manager
+
+Applied singleton pattern into `ConfigurationManager` class to manage application configuration.
+
+`ConfigurationManager` class: [`ConfigurationManager`](./src/main/java/com/springboot/bookstore/utils/ConfigurationManager.java)
+
+```java
+package com.springboot.bookstore.utils;
+
+import com.springboot.bookstore.utils.logger.Logger;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+public class ConfigurationManager {
+    private static volatile ConfigurationManager instance;
+    private final Properties properties = new Properties();
+
+    private ConfigurationManager() {
+        var logger = Logger.getInstance();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+            if (input != null) {
+                properties.load(input);
+            } else {
+                logger.error("bookstore.properties not found in classpath.");
+            }
+        } catch (Exception e) {
+            logger.fatal("Could not load application.properties: " + e.getMessage());
+        }
+    }
+
+    public static ConfigurationManager getInstance() {
+        if (instance == null) {
+            synchronized (ConfigurationManager.class) {
+                if (instance == null) {
+                    instance = new ConfigurationManager();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public String get(String key) {
+        return properties.getProperty(key);
+    }
+
+    public int getInt(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(properties.getProperty(key));
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    public double getDouble(String key, double defaultValue) {
+        try {
+            return Double.parseDouble(properties.getProperty(key));
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+}
+```
+
+Applies singleton pattern into `ConfigurationManager` class:
+- Ensure mismatch and duplicated configuration.
+- Easy global access through out the application.
+- Make application configuration upgradable in the future.
+- Cacheable since there aren't recreate or reload through out the application.
