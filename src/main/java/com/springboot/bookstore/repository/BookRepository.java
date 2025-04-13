@@ -2,6 +2,7 @@ package com.springboot.bookstore.repository;
 
 import com.springboot.bookstore.database.DBConnectionManager;
 import com.springboot.bookstore.model.Book;
+import com.springboot.bookstore.utils.logger.Logger;
 import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,9 +15,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class BookRepository {
+    private final Logger logger = Logger.getInstance();
 
     public List<Book> find() {
         List<Book> books = new ArrayList<>();
@@ -37,10 +38,11 @@ public class BookRepository {
             resultSet.close();
             statement.close();
             connection.close();
+            this.logger.log("Retrieved book list successfully.");
             return books;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            this.logger.fatal("Database connection could not be established. Error: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -55,13 +57,15 @@ public class BookRepository {
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();
+            this.logger.log("New book created successfully.");
             return true;
         } catch (PSQLException e) {
             String message = Objects.requireNonNull(e.getServerErrorMessage()).getMessage();
+            this.logger.error(message);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            this.logger.fatal("Database connection could not be established. Error: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }
