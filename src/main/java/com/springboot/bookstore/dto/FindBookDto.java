@@ -1,8 +1,12 @@
-package com.springboot.bookstore.model;
+package com.springboot.bookstore.dto;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public class Book {
+public class FindBookDto extends BaseRequestDto {
     private String id;
 
     private String title;
@@ -10,21 +14,6 @@ public class Book {
     private String author;
 
     private LocalDate publishDate;
-
-    public Book() {}
-
-    public Book(String title, String author, LocalDate publishDate) {
-        this.title = title;
-        this.author = author;
-        this.publishDate = publishDate;
-    }
-
-    public Book(String id, String title, String author, LocalDate publishDate) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.publishDate = publishDate;
-    }
 
     public String getId() {
         return id;
@@ -56,5 +45,14 @@ public class Book {
 
     public void setPublishDate(LocalDate publishDate) {
         this.publishDate = publishDate;
+    }
+
+    @Override
+    public void validateSortBy() {
+        final List<String> ALLOWED_SORT_FIELDS = List.of("title", "author", "publishDate");
+
+        if (this.sortBy != null && !ALLOWED_SORT_FIELDS.contains(this.sortBy)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid sortBy field: " + this.sortBy);
+        }
     }
 }
