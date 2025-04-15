@@ -166,7 +166,7 @@ public class ConfigurationManager {
             if (input != null) {
                 properties.load(input);
             } else {
-                logger.error("bookstore.properties not found in classpath.");
+                logger.error("application.properties not found in classpath.");
             }
         } catch (Exception e) {
             logger.fatal("Could not load application.properties: " + e.getMessage());
@@ -211,3 +211,84 @@ Applies singleton pattern into `ConfigurationManager` class:
 - Easy global access through out the application.
 - Make application configuration upgradable in the future.
 - Cacheable since there aren't recreate or reload through out the application.
+
+## Factory Pattern
+
+These are three ways to apply Factory pattern into Book store system.
+
+### Request param DTO validator factory
+
+The abstract `BaseRequestDto` class has an abstract method `validateSortBy()` method which validates the `orderBy`
+fields of child classes that implement the `BaseRequestDto` class.  
+
+[`BaseRequestDto`](./src/main/java/com/springboot/bookstore/dto/BaseRequestDto.java) class:
+
+```java
+package com.springboot.bookstore.dto;
+
+public abstract class BaseRequestDto {
+    protected int page;
+
+    protected int size;
+
+    protected String orderBy;
+
+    protected String sortBy;
+
+    public abstract void validateSortBy();
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+}
+```
+
+Then use the `RequestParamValidatorFactory` class to validate the `BaseRequestDto` class. Due to polymorphism any
+classes that implements the `BaseRequestDto` class can be validated.
+
+[`RequestParamValidatorFactory`](./src/main/java/com/springboot/bookstore/factory/RequestParamValidatorFactory.java) class:
+
+```java
+package com.springboot.bookstore.factory;
+
+import com.springboot.bookstore.dto.BaseRequestDto;
+
+public class RequestParamValidatorFactory {
+    public static void validateDto(BaseRequestDto dto) {
+        dto.validateSortBy();
+    }
+}
+```
+
+- Usage of the DTOs don't need to know the validation logic, juse use the validator factory - Factory delegates logics.
+- Easy to add new request types without modifying the factory - Open/close principle.
+- DTOs are responsible for validating their own fields.
+- Avoid duplicating DTO validation.

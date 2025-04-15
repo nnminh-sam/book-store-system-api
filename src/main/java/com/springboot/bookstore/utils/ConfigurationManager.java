@@ -15,7 +15,7 @@ public class ConfigurationManager {
             if (input != null) {
                 properties.load(input);
             } else {
-                logger.error("bookstore.properties not found in classpath.");
+                logger.error("application.properties not found in classpath.");
             }
         } catch (Exception e) {
             logger.fatal("Could not load application.properties: " + e.getMessage());
