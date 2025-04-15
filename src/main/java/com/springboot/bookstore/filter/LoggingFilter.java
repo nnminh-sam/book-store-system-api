@@ -12,10 +12,10 @@ public class LoggingFilter implements Filter {
             ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain
     ) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
-        String requestURI = httpRequest.getRequestURI();
-        String method = httpRequest.getMethod();
-        String ipAddress = httpRequest.getRemoteAddr();
-        String logMessage = String.format("[%s] %s: %s", ipAddress, method, requestURI);
+        var requestURI = httpRequest.getRequestURI();
+        var method = httpRequest.getMethod();
+        var ipAddress = httpRequest.getRemoteAddr();
+        var logMessage = String.format("[%s] %s: %s", ipAddress, method, requestURI);
 
         var logger = Logger.getInstance();
         logger.log("--- Request ---");

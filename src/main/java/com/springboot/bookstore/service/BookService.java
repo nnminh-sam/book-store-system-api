@@ -20,7 +20,11 @@ public class BookService {
     }
 
     public String create(CreateBookDto createBookDto) {
-        var result = this.bookRepository.save(new Book(createBookDto.getTitle(), createBookDto.getAuthor(), createBookDto.getPublishDate()));
+        var book = Book.builder()
+                .title(createBookDto.getTitle())
+                .author(createBookDto.getAuthor())
+                .publishDate(createBookDto.getPublishDate());
+        var result = this.bookRepository.save(book);
         if (!result) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot create book");
         }

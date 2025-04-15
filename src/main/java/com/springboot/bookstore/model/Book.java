@@ -26,6 +26,30 @@ public class Book {
         this.publishDate = publishDate;
     }
 
+    public static Book builder() {
+        return new Book();
+    }
+
+    public Book id(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public Book title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Book author(String author) {
+        this.author = author;
+        return this;
+    }
+
+    public Book publishDate(LocalDate publishDate) {
+        this.publishDate = publishDate;
+        return this;
+    }
+
     public String getId() {
         return id;
     }
